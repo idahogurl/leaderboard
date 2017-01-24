@@ -35,6 +35,7 @@ class LeaderBoard extends react_1.Component {
     constructor() {
         super();
         debugger;
+        this.users = [];
         this.fetchUsers();
     }
     fetchUsers() {
@@ -44,6 +45,9 @@ class LeaderBoard extends react_1.Component {
             this.users = JSON.stringify(response.data);
             console.log(response.status); // ex.: 200
         });
+    }
+    render() {
+        return (React.createElement("div", null));
     }
 }
 ReactDOM.render(React.createElement(LeaderBoard, null), document.getElementById("leaderBoard"));
