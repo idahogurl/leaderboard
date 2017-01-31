@@ -15,8 +15,7 @@ Hint: To get the top 100 campers of all time: https://fcctop100.herokuapp.com/ap
 Standing Avatar Username brownie points last 30 days, total brownie points
 */
 
-const serviceUrl = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
-
+const serviceUrl = "https://fcctop100.herokuapp.com/api/fccusers/top/";
 const React = require('react');
 const ReactDOM = require('react-dom');
 const Axios = require('axios');
@@ -33,9 +32,14 @@ class LeaderBoardHeaderRow extends Component<any,any> {
         let columns = this.props.columns.map(
             column => {
                 if (column.allowSort) { 
-                    return <div className={(column.sorted ? "sorted " : "") + "allow-sort col-xs-" + column.width} key={column.dataColumn}>{column.headerText}</div>;
+                    
+                    let className = (this.props.endpoint === column.dataColumn ? "sorted " : "") 
+                        + "allow-sort col-xs-" + column.width;
+
+                    return <div className={className} id={column.dataColumn} key={column.dataColumn} 
+                            onClick={this.props.onClick}>{column.headerText}</div>;
                 } else {
-                    return <div className={"col-xs-" + column.width} key={column.dataColumn} onClick={this.props.onClick}>{column.headerText}</div>;
+                    return <div className={"col-xs-" + column.width} key={column.dataColumn}>{column.headerText}</div>;
                 }
             }
         );
@@ -60,17 +64,15 @@ class LeaderBoardRow extends Component<any,any> {
 }
 
 class LeaderBoardColumn {
-    sorted: boolean;
     width: number;
     headerText: string;
     dataColumn: string;
     allowSort: boolean;
 
-    constructor(headerText: string, dataColumn: string, width: number, allowSort: boolean, sorted: boolean) {
+    constructor(headerText: string, dataColumn: string, width: number, allowSort: boolean) {
         this.headerText = headerText;
         this.dataColumn = dataColumn;
         this.allowSort = allowSort;
-        this.sorted = sorted;
         this.width = width;
     }
 }
@@ -94,13 +96,12 @@ class LeaderBoard extends Component<any,any> {
         let i = 1;
         let rows = this.props.users.map(
             user => {
-                debugger;
                 user.standing = i++;
                 return <LeaderBoardRow user={user} columns={this.props.columns} key={user.username}/>
             }
         );
         return (<div>
-            {rows.length > 0 ? <LeaderBoardHeaderRow columns={this.props.columns} onClick={this.props.onClick}/> : ""}
+            {rows.length > 0 ? <LeaderBoardHeaderRow columns={this.props.columns} endpoint={this.props.endpoint} onClick={this.props.onClick}/> : ""}
             {rows}
         </div>);
     }
@@ -108,47 +109,44 @@ class LeaderBoard extends Component<any,any> {
 
 class LeaderBoardColSrv {
     static getColumns() : LeaderBoardColumn[] {
-        let columns = [ new LeaderBoardColumn ("#","standing",1,false,false),
-            new LeaderBoardColumn("Camper Name","username",5,false,false),
-            new LeaderBoardColumn("Points last 30 days","recent",3,true,true),
-            new LeaderBoardColumn("All time points","alltime",3,true,false)];
+        let columns = [ new LeaderBoardColumn ("#","standing",1,false),
+            new LeaderBoardColumn("Camper Name","username",5,false),
+            new LeaderBoardColumn("Points last 30 days","recent",3,true),
+            new LeaderBoardColumn("All time points","alltime",3,true)];
         return columns;
     }
 }
 
 class LeaderBoardContainer extends Component<any,any> {
-    cols: LeaderBoardColumn[];
+    constructor() {
+        super();
+        this.state = {users:[], serviceEndpoint: "recent"};
 
-        constructor() {
-            super();
-            this.state = {users:[]};
+        this.handleClick = this.handleClick.bind(this);
+    }
 
-            this.handleClick.bind(this);
-        }
-
-       componentDidMount() {
+    componentDidMount() {
         debugger;
+        this.fetchUsers("recent");
+    }
+
+    fetchUsers(endpoint) {
         var self = this;
         // Performing a GET request
-        Axios.get(serviceUrl)
+        Axios.get(serviceUrl + endpoint)
         .then(function(response){
-            self.setState({users: response.data});
+            self.setState({users: response.data, endpoint: endpoint});
         });
     }
 
     handleClick(e) {
-        debugger;
-        this.state.users.sort(function(a,b) {
-            return b.recent - a.recent;
-        })
+        this.fetchUsers(e.target.id);
     }
 
     render() {
-        debugger;
-
-        let columns : LeaderBoardColumn[] = LeaderBoardColSrv.getColumns();
-
-        return <div><LeaderBoard users={this.state.users} columns={columns} onClick={this.handleClick}/></div>;
+    debugger;
+    let columns : LeaderBoardColumn[] = LeaderBoardColSrv.getColumns();
+    return <div><LeaderBoard users={this.state.users} columns={columns} endpoint={this.state.endpoint} onClick={this.handleClick}/></div>;
     }
 }
 
