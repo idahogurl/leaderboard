@@ -21,20 +21,58 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const Axios = require('axios');
 
+require('./sass/styles.scss');
+
 import {Component} from 'react';
 
+class LeaderBoardHeaderRow extends Component<any,any> {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        let columns = this.props.columns.map(
+            column => {
+                if (column.allowSort) { 
+                    return <div className={(column.sorted ? "sorted " : "") + "allow-sort col-xs-" + column.width} key={column.dataColumn}>{column.headerText}</div>;
+                } else {
+                    return <div className={"col-xs-" + column.width} key={column.dataColumn} onClick={this.props.onClick}>{column.headerText}</div>;
+                }
+            }
+        );
+        return (<div className="row" key="1">{columns}</div>);
+    }
+}
 
 class LeaderBoardRow extends Component<any,any> {
-    columns: LeaderBoardColumn[];
+    constructor(props) {
+        super(props);
+    }
     render() {
-        return (<div></div>);
+        let user = this.props.user;
+        let columns = this.props.columns.map(
+            column => {
+                return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}>{user[column.dataColumn]}</div>;
+            }
+        );
+
+        return (<div className="row">{columns}</div>);
     }
 }
 
 class LeaderBoardColumn {
-    sort: string;
+    sorted: boolean;
+    width: number;
     headerText: string;
     dataColumn: string;
+    allowSort: boolean;
+
+    constructor(headerText: string, dataColumn: string, width: number, allowSort: boolean, sorted: boolean) {
+        this.headerText = headerText;
+        this.dataColumn = dataColumn;
+        this.allowSort = allowSort;
+        this.sorted = sorted;
+        this.width = width;
+    }
 }
 
 class User {
@@ -42,37 +80,73 @@ class User {
     img: string;
     alltime: number;
     recent: number;
-}
-
-class UserDataSrv {
-    
+    lastUpdate: string;
+    standing: number;
 }
 
 class LeaderBoard extends Component<any,any> {
-    users: User[];
-    cols: LeaderBoardColumn[];
-
-    constructor() {
-        super();
-        debugger;
-        this.users = [];
-        this.fetchUsers();
-    }
-
-    fetchUsers() {
-        // Performing a GET request
-        Axios.get(serviceUrl)
-        .then(function(response){
-            
-            this.users = JSON.stringify(response.data);
-            
-            console.log(response.status); // ex.: 200
-        });
+    constructor(props) {
+        super(props);
     }
 
     render() {
-        return (<div></div>);
+        debugger;
+        let i = 1;
+        let rows = this.props.users.map(
+            user => {
+                debugger;
+                user.standing = i++;
+                return <LeaderBoardRow user={user} columns={this.props.columns} key={user.username}/>
+            }
+        );
+        return (<div>
+            {rows.length > 0 ? <LeaderBoardHeaderRow columns={this.props.columns} onClick={this.props.onClick}/> : ""}
+            {rows}
+        </div>);
     }
 }
 
-ReactDOM.render(<LeaderBoard/>, document.getElementById("leaderBoard"));
+class LeaderBoardColSrv {
+    static getColumns() : LeaderBoardColumn[] {
+        let columns = [ new LeaderBoardColumn ("#","standing",1,false,false),
+            new LeaderBoardColumn("Camper Name","username",5,false,false),
+            new LeaderBoardColumn("Points last 30 days","recent",3,true,true),
+            new LeaderBoardColumn("All time points","alltime",3,true,false)];
+        return columns;
+    }
+}
+
+class LeaderBoardContainer extends Component<any,any> {
+    cols: LeaderBoardColumn[];
+
+        constructor() {
+            super();
+            this.state = {users:[]};
+
+            this.handleClick.bind(this);
+        }
+
+       componentDidMount() {
+        debugger;
+        var self = this;
+        // Performing a GET request
+        Axios.get(serviceUrl)
+        .then(function(response){
+            self.setState({users: response.data});
+        });
+    }
+
+    handleClick(e) {
+
+    }
+
+    render() {
+        debugger;
+
+        let columns : LeaderBoardColumn[] = LeaderBoardColSrv.getColumns();
+
+        return <div><LeaderBoard users={this.state.users} columns={columns} onClick={this.handleClick}/></div>;
+    }
+}
+
+ReactDOM.render(<LeaderBoardContainer/>, document.getElementById("leaderBoard"));

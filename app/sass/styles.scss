@@ -1,0 +1,50 @@
+$dark-green: #006400;
+$table-width: 70%;
+$padding: 10px;
+
+@mixin border($widths) {
+    border-color: grey;
+    border-style: solid;
+    border-width: $widths;
+}
+
+body {
+    margin: 20px;
+    font-family: "Roboto", sans-serif;
+}
+
+.row {
+    @include border(1px 0 0 1px);
+    padding: 0;
+    margin: 0;
+    width: $table-width;
+    &:nth-of-type(odd){
+        background-color: gainsboro;
+        
+    }
+    &:first-child {
+        font-weight: bold;
+    }
+    div {        
+        padding: $padding;
+        @include border(0 1px 0 0);
+    }    
+}   
+
+.header {
+     background-color: $dark-green;
+     color: white;
+     text-align: center;
+     width: $table-width;
+     padding: $padding;
+     margin: 0;
+  }
+
+  .sorted {
+      text-decoration: underline;
+      color: $dark-green;            
+  }
+
+  .allow-sort {
+      cursor: pointer;
+  }
