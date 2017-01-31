@@ -102,6 +102,10 @@ class LeaderBoardContainer extends react_1.Component {
         });
     }
     handleClick(e) {
+        debugger;
+        this.state.users.sort(function (a, b) {
+            return b.recent - a.recent;
+        });
     }
     render() {
         debugger;
