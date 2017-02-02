@@ -30,19 +30,19 @@ class LeaderBoardHeaderRow extends react_1.Component {
             if (column.allowSort) {
                 let className = (this.props.endpoint === column.dataColumn ? "sorted " : "")
                     + "allow-sort col-xs-" + column.width;
-                let sortArrow = React.createElement("span", null);
+                let sortArrow = null;
                 if (this.props.endpoint === column.dataColumn) {
                     sortArrow = React.createElement("span", { className: "glyphicon glyphicon-triangle-bottom" });
                 }
                 return React.createElement("div", { className: className, id: column.dataColumn, key: column.dataColumn, onClick: this.props.onClick },
                     column.headerText,
-                    { sortArrow });
+                    sortArrow);
             }
             else {
                 return React.createElement("div", { className: "col-xs-" + column.width, key: column.dataColumn }, column.headerText);
             }
         });
-        return (React.createElement("div", { className: "row", key: "1" }, columns));
+        return (React.createElement("div", { className: "row", key: "header" }, columns));
     }
 }
 class LeaderBoardRow extends react_1.Component {
@@ -52,12 +52,13 @@ class LeaderBoardRow extends react_1.Component {
     render() {
         let user = this.props.user;
         let columns = this.props.columns.map(column => {
+            let img = null;
             if (column.dataColumn == "username") {
-                return React.createElement("div", { className: "col-xs-" + column.width, key: column.dataColumn + "_" + user.username },
-                    React.createElement("img", { className: "avatar thumbnail", src: user.img, alt: user.username }),
-                    user[column.dataColumn]);
+                img = React.createElement("img", { className: "avatar thumbnail", src: user.img, alt: user.username });
             }
-            return React.createElement("div", { className: "col-xs-" + column.width, key: column.dataColumn + "_" + user.username }, user[column.dataColumn]);
+            return React.createElement("div", { className: "col-xs-" + column.width, key: column.dataColumn + "_" + user.username },
+                img,
+                user[column.dataColumn]);
         });
         return (React.createElement("div", { className: "row" }, columns));
     }
@@ -77,7 +78,6 @@ class LeaderBoard extends react_1.Component {
         super(props);
     }
     render() {
-        debugger;
         let i = 1;
         let rows = this.props.users.map(user => {
             user.standing = i++;
@@ -104,7 +104,6 @@ class LeaderBoardContainer extends react_1.Component {
         this.handleClick = this.handleClick.bind(this);
     }
     componentDidMount() {
-        debugger;
         this.fetchUsers("recent");
     }
     fetchUsers(endpoint) {
@@ -119,7 +118,6 @@ class LeaderBoardContainer extends react_1.Component {
         this.fetchUsers(e.target.id);
     }
     render() {
-        debugger;
         let columns = LeaderBoardColSrv.getColumns();
         return React.createElement("div", null,
             React.createElement(LeaderBoard, { users: this.state.users, columns: columns, endpoint: this.state.endpoint, onClick: this.handleClick }));

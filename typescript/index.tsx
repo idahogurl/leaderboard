@@ -35,20 +35,20 @@ class LeaderBoardHeaderRow extends Component<any,any> {
                     
                     let className = (this.props.endpoint === column.dataColumn ? "sorted " : "") 
                         + "allow-sort col-xs-" + column.width;
-                    let sortArrow = <span></span>;
+                    let sortArrow : Object = null;
                     if (this.props.endpoint === column.dataColumn) {
                         sortArrow = <span className="glyphicon glyphicon-triangle-bottom"></span>;
                     }
                     return <div className={className} id={column.dataColumn} key={column.dataColumn} 
                             onClick={this.props.onClick}>
-                            {column.headerText}{{sortArrow}}
+                            {column.headerText}{sortArrow}
                             </div>;
                 } else {
                     return <div className={"col-xs-" + column.width} key={column.dataColumn}>{column.headerText}</div>;
                 }
             }
         );
-        return (<div className="row" key="1">{columns}</div>);
+        return (<div className="row" key="header">{columns}</div>);
     }
 }
 
@@ -61,10 +61,12 @@ class LeaderBoardRow extends Component<any,any> {
         let columns = this.props.columns.map(
             column => {
                 
+                let img : Object = null;
                 if (column.dataColumn == "username") {
-                return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}><img className="avatar thumbnail" src={user.img} alt={user.username}/>{user[column.dataColumn]}</div>;
+                    img = <img className="avatar thumbnail" src={user.img} alt={user.username}/>;
                 }
-                return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}>{user[column.dataColumn]}</div>;
+                
+                return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}>{img}{user[column.dataColumn]}</div>;
             }
         );
 
@@ -101,7 +103,6 @@ class LeaderBoard extends Component<any,any> {
     }
 
     render() {
-        debugger;
         let i = 1;
         let rows = this.props.users.map(
             user => {
@@ -135,7 +136,6 @@ class LeaderBoardContainer extends Component<any,any> {
     }
 
     componentDidMount() {
-        debugger;
         this.fetchUsers("recent");
     }
 
@@ -153,7 +153,7 @@ class LeaderBoardContainer extends Component<any,any> {
     }
 
     render() {
-    debugger;
+    
     let columns : LeaderBoardColumn[] = LeaderBoardColSrv.getColumns();
     return <div><LeaderBoard users={this.state.users} columns={columns} endpoint={this.state.endpoint} onClick={this.handleClick}/></div>;
     }
