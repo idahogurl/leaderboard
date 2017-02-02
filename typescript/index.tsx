@@ -35,9 +35,14 @@ class LeaderBoardHeaderRow extends Component<any,any> {
                     
                     let className = (this.props.endpoint === column.dataColumn ? "sorted " : "") 
                         + "allow-sort col-xs-" + column.width;
-
+                    let sortArrow = <span></span>;
+                    if (this.props.endpoint === column.dataColumn) {
+                        sortArrow = <span className="glyphicon glyphicon-triangle-bottom"></span>;
+                    }
                     return <div className={className} id={column.dataColumn} key={column.dataColumn} 
-                            onClick={this.props.onClick}>{column.headerText}</div>;
+                            onClick={this.props.onClick}>
+                            {column.headerText}{{sortArrow}}
+                            </div>;
                 } else {
                     return <div className={"col-xs-" + column.width} key={column.dataColumn}>{column.headerText}</div>;
                 }
@@ -55,6 +60,10 @@ class LeaderBoardRow extends Component<any,any> {
         let user = this.props.user;
         let columns = this.props.columns.map(
             column => {
+                
+                if (column.dataColumn == "username") {
+                return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}><img className="avatar thumbnail" src={user.img} alt={user.username}/>{user[column.dataColumn]}</div>;
+                }
                 return <div className={"col-xs-" + column.width} key={column.dataColumn + "_" + user.username}>{user[column.dataColumn]}</div>;
             }
         );

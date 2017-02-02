@@ -16,28 +16,33 @@ body {
 .row {
     @include border(1px 0 0 1px);
     padding: 0;
-    margin: 0;
+    margin: auto;
     width: $table-width;
     &:nth-of-type(odd){
         background-color: gainsboro;
-        
     }
-    &:first-child {
+    &:first-child {        
         font-weight: bold;
+        div {
+            height: 40px;
+        }
     }
-    div {        
+    &:last-of-type {
+        border-bottom-width: 1px;
+    }
+    div {
         padding: $padding;
+        height: 80px;
         @include border(0 1px 0 0);
-    }    
+    }
 }   
-
 .header {
      background-color: $dark-green;
      color: white;
      text-align: center;
      width: $table-width;
      padding: $padding;
-     margin: 0;
+     margin: auto;     
   }
 
   .sorted {
@@ -47,4 +52,10 @@ body {
 
   .allow-sort {
       cursor: pointer;
+  }
+
+  .avatar {
+      width: 20%;
+      display: inline-block;
+      margin-right: 10px;
   }
